@@ -121,7 +121,7 @@
                             <p>Price: £{{ item.price }}</p>
                             <p>Quantity: {{ item.qty }}</p>
                             <button class="btn btn-primary"
-                                v-on:click="remove(item.id)">Remove</button>
+                                v-on:click="removeFromCart(item.id)">Remove</button>
                         </div>
                         <div class="col-md-3">
                             <img v-bind:src="item.image" class="img-book" alt="book">
@@ -223,7 +223,7 @@
 
             }, methods: {
                 addToCart: function (item) {
-                    console.log(item);
+    
                     let updated = 0;
                     for (var i = 0; i < this.cart.length; i++) {
                         if (this.cart[i].id == item.id) {
@@ -243,6 +243,19 @@
                         }
                     }
                 },
+                removeFromCart: function (id) {
+       
+                    let qty = this.cart.filter(e=>{ return e.id == id;})[0].qty;
+                    console.log(qty);
+                    this.cart = this.cart.filter(e=>{ return e.id != id;});
+                    
+                    for (var i = 0; i < this.lessonsData.length; i++) {
+                        if (this.lessonsData[i].id == id) {
+                            this.lessonsData[i].space = this.lessonsData[i].space +qty;
+                            break;
+                        }
+                    }
+                },
                 goToCheckout:function(){
                     this.showProduct=false;
                 },
@@ -251,7 +264,7 @@
                 }
             }, computed: {
                 totalItemsInCart: function () {
-                    return this.cart.reduce((accumulator, current) => accumulator + current.qty, 0) || 0;
+                    return this.cart.length || 0;
                 }
             }
         });
