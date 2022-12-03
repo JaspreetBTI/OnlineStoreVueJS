@@ -19,7 +19,7 @@
         <header>
             <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
                 <div class="container-fluid">
-                    <a class="navbar-brand" v-on:click="goToHome">Online Store</a>
+                    <button class="navbar-brand" v-on:click="goToHome">Online Store</button>
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                         aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
@@ -27,10 +27,11 @@
                     <div class="collapse navbar-collapse" id="navbarNav">
                         <ul class="navbar-nav mx-right">
                             <li class="nav-item">
-                                <a class="nav-link" v-on:click="goToHome">Home</a>
+                                <button class="nav-link" v-on:click="goToHome">Home</button>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link"  v-on:click="goToCheckout">Cart({{totalItemsInCart}})</a>
+                                <button class="nav-link" :disabled="(totalItemsInCart==0)"
+                                    v-on:click="goToCheckout">Cart({{totalItemsInCart}})</button>
                             </li>
 
                         </ul>
@@ -110,6 +111,10 @@
             </div>
         </div>
         <div class="container" v-else>
+            <div v-if="orderComplete">
+                <h3>Thank You For Your Order</h3>
+            </div>
+            <divv-else>
             <h2>Shopping Cart</h2>
             <div class="row">
                 <div class="card col-md-3 p-2 mr-2" v-for="item in cart">
@@ -120,8 +125,7 @@
                             <p>Location: {{ item.location }}</p>
                             <p>Price: £{{ item.price }}</p>
                             <p>Quantity: {{ item.qty }}</p>
-                            <button class="btn btn-primary"
-                                v-on:click="removeFromCart(item.id)">Remove</button>
+                            <button class="btn btn-primary" v-on:click="removeFromCart(item.id)">Remove</button>
                         </div>
                         <div class="col-md-3">
                             <img v-bind:src="item.image" class="img-book" alt="book">
@@ -131,13 +135,36 @@
                 </div>
 
             </div>
+            <h2>Checkout</h2>
+            <div class="row g-3 align-items-center">
+                <div class="col-auto">
+                    <label for="name" class="col-form-label" v-model="checkout.name">Name</label>
+                </div>
+                <div class="col-auto">
+                    <input type="text" id="name" class="form-control">
+                </div>
+                <div class="col-auto">
+                    <label for="phone" class="col-form-label" v-model="checkout.phone">Phone</label>
+                </div>
+                <div class="col-auto">
+                    <input type="text" id="phone" class="form-control">
+                </div>
+
+                <div class="col-auto">
+                    <input type="submit" value="Checkout" v-on:click="checkout" :disabled="(isCheckoutInValid)" class="btn btn-primary">
+                </div>
+            </div>
         </div>
+
+    </div>
+    </div>
     </div>
     <script type="text/javascript">
         let webstore = new Vue({ // The Vue instance
             el: '#app',
             data: {
-                showProduct:true,
+                showProduct: true,
+                orderComplete:false,
                 lessonsData: [{
                     "id": "1",
                     "subject": "English",
@@ -220,10 +247,14 @@
                     "image": "assets/images/book.png"
                 }],
                 cart: [],
+                checkout: {
+                    name: "",
+                    phone: ""
+                }
 
             }, methods: {
                 addToCart: function (item) {
-    
+
                     let updated = 0;
                     for (var i = 0; i < this.cart.length; i++) {
                         if (this.cart[i].id == item.id) {
@@ -233,7 +264,7 @@
                         }
                     }
                     if (!updated) {
-                        item.qty=1;
+                        item.qty = 1;
                         this.cart.push(item);
                     }
                     for (var i = 0; i < this.lessonsData.length; i++) {
@@ -242,29 +273,32 @@
                             break;
                         }
                     }
+                    this.orderComplete=false;
                 },
                 removeFromCart: function (id) {
-       
-                    let qty = this.cart.filter(e=>{ return e.id == id;})[0].qty;
-                    console.log(qty);
-                    this.cart = this.cart.filter(e=>{ return e.id != id;});
-                    
+
+                    let qty = this.cart.filter(e => {return e.id == id;})[0].qty;
+                    this.cart = this.cart.filter(e => {return e.id != id;});
+
                     for (var i = 0; i < this.lessonsData.length; i++) {
                         if (this.lessonsData[i].id == id) {
-                            this.lessonsData[i].space = this.lessonsData[i].space +qty;
+                            this.lessonsData[i].space = this.lessonsData[i].space + qty;
                             break;
                         }
                     }
                 },
-                goToCheckout:function(){
-                    this.showProduct=false;
+                goToCheckout: function () {
+                    this.showProduct = false;
                 },
-                goToHome:function(){
-                    this.showProduct=true;
+                goToHome: function () {
+                    this.showProduct = true;
                 }
             }, computed: {
                 totalItemsInCart: function () {
                     return this.cart.length || 0;
+                },
+                isCheckoutInValid: function () {
+                    return true;
                 }
             }
         });
