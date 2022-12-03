@@ -1,0 +1,21 @@
+
+#app {
+  margin: 0 auto;
+
+  font-weight: normal;
+}
+.card.col-md-3.p-2.mr-2 {
+  margin-left: 10px;
+  margin-bottom: 10px;
+}
+.card {
+  flex: 0 0 auto;
+  width: 32% !important;
+}
+img.img-book {
+  width: 70px;
+}
+.col-md-9 {
+  flex: 0 0 auto;
+  width: 65% !important;
+}
