@@ -8,6 +8,7 @@
     <title>Online Store</title>
     <link rel="stylesheet" href="assets/css/main.css">
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.0"></script>
+    <script type="text/javascript" src="lessons.js"></script>
     <!-- Latest compiled and minified CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
@@ -39,7 +40,7 @@
                 </div>
             </nav>
         </header>
-        
+
         <div class="container" v-if="showProduct">
             <h1 class="text-center my-3">Welcome To Online Store</h1>
             <div class="row">
@@ -48,38 +49,44 @@
                         <form action="" v-on:change="">
                             <h6>Sort By</h6>
                             <div class="form-check">
-                                <input class="form-check-input" value="subject" type="radio" name="sortBy" v-model="sortBy">
+                                <input class="form-check-input" v-on:change="sortProducts" value="subject" type="radio"
+                                    name="sortBy" v-model="sortBy">
                                 <label class="form-check-label" for="flexRadioDefault1">
                                     Subject
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" value="location" type="radio" name="sortBy" v-model="sortBy">
+                                <input class="form-check-input" v-on:change="sortProducts" value="location" type="radio"
+                                    name="sortBy" v-model="sortBy">
                                 <label class="form-check-label" for="flexRadioDefault1">
                                     Location
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" value="price" type="radio" name="sortBy" v-model="sortBy">
+                                <input class="form-check-input" v-on:change="sortProducts" value="price" type="radio"
+                                    name="sortBy" v-model="sortBy">
                                 <label class="form-check-label" for="flexRadioDefault1">
                                     Price
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" value="availability" type="radio" name="sortBy" v-model="sortBy">
+                                <input class="form-check-input" v-on:change="sortProducts" value="availability"
+                                    type="radio" name="sortBy" v-model="sortBy">
                                 <label class="form-check-label" for="flexRadioDefault1">
                                     Availability
                                 </label>
                             </div>
                             <h6>Order By</h6>
                             <div class="form-check">
-                                <input class="form-check-input" value="asc" type="radio" name="orderBy" v-model="orderBy">
+                                <input class="form-check-input" v-on:change="sortProducts" value="asc" type="radio"
+                                    name="orderBy" v-model="orderBy">
                                 <label class="form-check-label" for="flexRadioDefault1">
                                     Ascending
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" value="desc" type="radio" name="orderBy" v-model="orderBy">
+                                <input class="form-check-input" v-on:change="sortProducts" value="desc" type="radio"
+                                    name="orderBy" v-model="orderBy">
                                 <label class="form-check-label" for="flexRadioDefault1">
                                     Descending
                                 </label>
@@ -89,7 +96,7 @@
                 </div>
                 <div class="col-md-10">
                     <div class="row">
-                        <div class="card col-md-3 p-2 mr-2" v-for="item in getProductData()">
+                        <div class="card col-md-3 p-2 mr-2" v-for="item in lessonsData">
 
                             <div class="row">
                                 <div class="col-md-9">
@@ -167,101 +174,18 @@
         let webstore = new Vue({ // The Vue instance
             el: '#app',
             data: {
-                sortBy:"subject",
-                orderBy:"asc",
+                sortBy: "subject",
+                orderBy: "asc",
                 showProduct: true,
                 orderComplete: false,
-                lessonsData: [{
-                    "id": "1",
-                    "subject": "English",
-                    "location": "London",
-                    "price": "125",
-                    "space": "5",
-                    "icon": "fa-solid fa-book-open",
-                    "image": "assets/images/book.png"
-                }, {
-                    "id": "2",
-                    "subject": "Spanish",
-                    "location": "London",
-                    "price": "120",
-                    "space": "5",
-                    "icon": "fa-solid fa-book-open",
-                    "image": "assets/images/book.png"
-                }, {
-                    "id": "3",
-                    "subject": "Maths",
-                    "location": "London",
-                    "price": "110",
-                    "space": "5",
-                    "icon": "fa-solid fa-book-open",
-                    "image": "assets/images/book.png"
-                }, {
-                    "id": "4",
-                    "subject": "Physics",
-                    "location": "London",
-                    "price": "115",
-                    "space": "5",
-                    "icon": "fa-solid fa-book-open",
-                    "image": "assets/images/book.png"
-                }, {
-                    "id": "5",
-                    "subject": "Chemistry",
-                    "location": "London",
-                    "price": "125",
-                    "space": "5",
-                    "icon": "fa-solid fa-book-open",
-                    "image": "assets/images/book.png"
-                }, {
-                    "id": "6",
-                    "subject": "Japanese",
-                    "location": "London",
-                    "price": "130",
-                    "space": "5",
-                    "icon": "fa-solid fa-book-open",
-                    "image": "assets/images/book.png"
-                }, {
-                    "id": "7",
-                    "subject": "Biology",
-                    "location": "London",
-                    "price": "140",
-                    "space": "5",
-                    "icon": "fa-solid fa-book-open",
-                    "image": "assets/images/book.png"
-                }, {
-                    "id": "8",
-                    "subject": "Robotics",
-                    "location": "London",
-                    "price": "106",
-                    "space": "5",
-                    "icon": "fa-solid fa-book-open",
-                    "image": "assets/images/book.png"
-                }, {
-                    "id": "9",
-                    "subject": "Technology",
-                    "location": "London",
-                    "price": "100",
-                    "space": "5",
-                    "icon": "fa-solid fa-book-open",
-                    "image": "assets/images/book.png"
-                }, {
-                    "id": "10",
-                    "subject": "Nursing",
-                    "location": "London",
-                    "price": "145",
-                    "space": "5",
-                    "icon": "fa-solid fa-book-open",
-                    "image": "assets/images/book.png"
-                }],
-                cart: [],
+                lessonsData: dataJSON, cart: [],
                 checkout: {
                     name: "",
                     phone: "",
                 }
 
             }, methods: {
-                getProductData:function(){
-                    return this.lessonsData;
-                },
+                
                 addToCart: function (item) {
 
                     let updated = 0;
@@ -305,14 +229,37 @@
                 checkoutOrder: function () {
                     this.cart = [];
                     this.orderComplete = true;
-                }
+                },
+                sortProducts: function () {
+                    let asc=1;
+                    let desc=-1;
+                    if (this.orderBy == "desc") {
+                        asc=-1;
+                        desc=1;
+                    }
+                    if (this.sortBy == "subject") {
+                        return this.lessonsData.sort((r1, r2) => (r1.subject > r2.subject) ? asc : (r1.subject < r2.subject) ? desc : 0);
+                    }
+                    if (this.sortBy == "location") {
+                        return this.lessonsData.sort((r1, r2) => (r1.location > r2.location) ? asc : (r1.location < r2.location) ? desc : 0);
+                    }
+                    if (this.sortBy == "price") {
+                        return this.lessonsData.sort((r1, r2) => (r1.price > r2.price) ? asc : (r1.price < r2.price) ? desc : 0);
+                    }
+                    if (this.sortBy == "space") {
+                        return this.lessonsData.sort((r1, r2) => (r1.space > r2.space) ? asc : (r1.space < r2.space) ? desc : 0);
+                    }
+                    
+                },
+                
             }, computed: {
                 totalItemsInCart: function () {
                     return this.cart.length || 0;
                 },
                 isCheckoutInValid: function () {
                     return !/^[a-zA-Z]+$/.test(this.checkout.name) || !/^[0-9]+$/.test(this.checkout.phone);
-                }
+                },
+
             }
         });
     </script>
