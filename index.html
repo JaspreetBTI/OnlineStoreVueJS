@@ -39,46 +39,47 @@
                 </div>
             </nav>
         </header>
-        <h1 class="text-center my-3">Welcome To Online Store</h1>
+        
         <div class="container" v-if="showProduct">
+            <h1 class="text-center my-3">Welcome To Online Store</h1>
             <div class="row">
                 <div class="col-md-2">
                     <div class="cont">
                         <form action="" v-on:change="">
                             <h6>Sort By</h6>
                             <div class="form-check">
-                                <input class="form-check-input" value="subject" type="radio" name="sortBy">
+                                <input class="form-check-input" value="subject" type="radio" name="sortBy" v-model="sortBy">
                                 <label class="form-check-label" for="flexRadioDefault1">
                                     Subject
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" value="location" type="radio" name="sortBy">
+                                <input class="form-check-input" value="location" type="radio" name="sortBy" v-model="sortBy">
                                 <label class="form-check-label" for="flexRadioDefault1">
                                     Location
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" value="price" type="radio" name="sortBy">
+                                <input class="form-check-input" value="price" type="radio" name="sortBy" v-model="sortBy">
                                 <label class="form-check-label" for="flexRadioDefault1">
                                     Price
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" value="availability" type="radio" name="sortBy">
+                                <input class="form-check-input" value="availability" type="radio" name="sortBy" v-model="sortBy">
                                 <label class="form-check-label" for="flexRadioDefault1">
                                     Availability
                                 </label>
                             </div>
                             <h6>Order By</h6>
                             <div class="form-check">
-                                <input class="form-check-input" value="ascending" type="radio" name="orderBy">
+                                <input class="form-check-input" value="asc" type="radio" name="orderBy" v-model="orderBy">
                                 <label class="form-check-label" for="flexRadioDefault1">
                                     Ascending
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" value="descending" type="radio" name="orderBy">
+                                <input class="form-check-input" value="desc" type="radio" name="orderBy" v-model="orderBy">
                                 <label class="form-check-label" for="flexRadioDefault1">
                                     Descending
                                 </label>
@@ -88,7 +89,7 @@
                 </div>
                 <div class="col-md-10">
                     <div class="row">
-                        <div class="card col-md-3 p-2 mr-2" v-for="item in lessonsData">
+                        <div class="card col-md-3 p-2 mr-2" v-for="item in getProductData()">
 
                             <div class="row">
                                 <div class="col-md-9">
@@ -114,57 +115,62 @@
             <div v-if="orderComplete">
                 <h3>Thank You For Your Order</h3>
             </div>
-            <divv-else>
-            <h2>Shopping Cart</h2>
-            <div class="row">
-                <div class="card col-md-3 p-2 mr-2" v-for="item in cart">
+            <div v-else>
+                <h2>Shopping Cart</h2>
+                <div class="row">
+                    <div class="card col-md-3 p-2 mr-2" v-for="item in cart">
 
-                    <div class="row">
-                        <div class="col-md-9">
-                            <p>Subject: {{ item.subject }}</p>
-                            <p>Location: {{ item.location }}</p>
-                            <p>Price: £{{ item.price }}</p>
-                            <p>Quantity: {{ item.qty }}</p>
-                            <button class="btn btn-primary" v-on:click="removeFromCart(item.id)">Remove</button>
+                        <div class="row">
+                            <div class="col-md-9">
+                                <p>Subject: {{ item.subject }}</p>
+                                <p>Location: {{ item.location }}</p>
+                                <p>Price: £{{ item.price }}</p>
+                                <p>Quantity: {{ item.qty }}</p>
+                                <button class="btn btn-primary" v-on:click="removeFromCart(item.id)">Remove</button>
+                            </div>
+                            <div class="col-md-3">
+                                <img v-bind:src="item.image" class="img-book" alt="book">
+                            </div>
                         </div>
-                        <div class="col-md-3">
-                            <img v-bind:src="item.image" class="img-book" alt="book">
-                        </div>
+
                     </div>
 
                 </div>
-
+                <h2>Checkout</h2>
+                <div class="row g-3 align-items-center">
+                    <div class="col-auto">
+                        <label for="name" class="col-form-label">Name</label>
+                    </div>
+                    <div class="col-auto">
+                        <input type="text" id="name" class="form-control" v-model="checkout.name">
+                    </div>
+                    <div class="col-auto">
+                        <label for="phone" class="col-form-label">Phone</label>
+                    </div>
+                    <div class="col-auto">
+                        <input type="text" id="phone" class="form-control" v-model="checkout.phone">
+                    </div>
+                    <div class="col-auto" v-if="isCheckoutInValid">
+                        <input type="submit" value="Checkout" v-on:click="checkoutOrder()" disabled
+                            class="btn btn-primary">
+                    </div>
+                    <div class="col-auto" v-else>
+                        <input type="submit" value="Checkout" v-on:click="checkoutOrder()" class="btn btn-primary">
+                    </div>
+                </div>
             </div>
-            <h2>Checkout</h2>
-            <div class="row g-3 align-items-center">
-                <div class="col-auto">
-                    <label for="name" class="col-form-label" v-model="checkout.name">Name</label>
-                </div>
-                <div class="col-auto">
-                    <input type="text" id="name" class="form-control">
-                </div>
-                <div class="col-auto">
-                    <label for="phone" class="col-form-label" v-model="checkout.phone">Phone</label>
-                </div>
-                <div class="col-auto">
-                    <input type="text" id="phone" class="form-control">
-                </div>
 
-                <div class="col-auto">
-                    <input type="submit" value="Checkout" v-on:click="checkout" :disabled="(isCheckoutInValid)" class="btn btn-primary">
-                </div>
-            </div>
         </div>
+    </div>
 
-    </div>
-    </div>
-    </div>
     <script type="text/javascript">
         let webstore = new Vue({ // The Vue instance
             el: '#app',
             data: {
+                sortBy:"subject",
+                orderBy:"asc",
                 showProduct: true,
-                orderComplete:false,
+                orderComplete: false,
                 lessonsData: [{
                     "id": "1",
                     "subject": "English",
@@ -249,10 +255,13 @@
                 cart: [],
                 checkout: {
                     name: "",
-                    phone: ""
+                    phone: "",
                 }
 
             }, methods: {
+                getProductData:function(){
+                    return this.lessonsData;
+                },
                 addToCart: function (item) {
 
                     let updated = 0;
@@ -273,7 +282,7 @@
                             break;
                         }
                     }
-                    this.orderComplete=false;
+                    this.orderComplete = false;
                 },
                 removeFromCart: function (id) {
 
@@ -292,13 +301,17 @@
                 },
                 goToHome: function () {
                     this.showProduct = true;
+                },
+                checkoutOrder: function () {
+                    this.cart = [];
+                    this.orderComplete = true;
                 }
             }, computed: {
                 totalItemsInCart: function () {
                     return this.cart.length || 0;
                 },
                 isCheckoutInValid: function () {
-                    return true;
+                    return !/^[a-zA-Z]+$/.test(this.checkout.name) || !/^[0-9]+$/.test(this.checkout.phone);
                 }
             }
         });
