@@ -105,7 +105,7 @@
                                     <p>Price: £{{ item.price }}</p>
                                     <p>Space: {{ item.space }}</p>
                                     <button class="btn btn-primary" :disabled="(item.space<1)"
-                                        v-on:click="addToCart(item)">Add To Cart</button>
+                                        v-on:click="addToCart(item)">Add Lesson To Cart</button>
                                 </div>
                                 <div class="col-md-3">
                                     <img v-bind:src="item.image" class="img-book" alt="book">
