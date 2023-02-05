@@ -131,7 +131,7 @@
                                 <p>Location: {{ item.location }}</p>
                                 <p>Price: £{{ item.price }}</p>
                                 <p>Quantity: {{ item.qty }}</p>
-                                <button class="btn btn-primary" v-on:click="removeFromCart(item.id)">Remove</button>
+                                <button class="btn btn-primary" v-on:click="removeFromCart(item._id)">Remove</button>
                             </div>
                             <div class="col-md-3">
                                 <img v-bind:src="item.image" class="img-book" alt="book">
@@ -169,97 +169,140 @@
     </div>
 
     <script type="text/javascript">
-        let webstore = new Vue({
-            el: '#app',
-            data: {
-                sortBy: "subject",
-                orderBy: "asc",
-                showProduct: true,
-                orderComplete: false,
-                lessonsData: dataJSON, cart: [],
-                checkout: {
-                    name: "",
-                    phone: "",
+        function createRequest(METHOD, ROUTE, d) {
+            var xhr = new XMLHttpRequest();
+            xhr.open(METHOD, getURL() + "/" + ROUTE, true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 201) {
+                    var response = JSON.parse(xhr.responseText);
+                    console.log(response.message);
                 }
+            };
 
-            }, methods: {
-                
-                addToCart: function (item) {
-
-                    let updated = 0;
-                    for (var i = 0; i < this.cart.length; i++) {
-                        if (this.cart[i].id == item.id) {
-                            this.cart[i].qty = this.cart[i].qty + 1;
-                            updated = 1;
-                            break;
+            xhr.send(JSON.stringify(d));
+        }
+        // function to return url
+        function getURL() {
+            return "https://handsome-fox-hosiery.cyclic.app";
+        }
+        // here starts the main script for vue js
+        var xhr = new XMLHttpRequest();
+        // fetch lessons from server
+        xhr.open("GET", getURL() + "/lessons", true);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                let webstore = new Vue({
+                    el: '#app',
+                    data: {
+                        sortBy: "subject",
+                        orderBy: "asc",
+                        showProduct: true,
+                        orderComplete: false,
+                        lessonsData: JSON.parse(xhr.responseText), cart: [],
+                        checkout: {
+                            name: "",
+                            phone: "",
                         }
-                    }
-                    if (!updated) {
-                        item.qty = 1;
-                        this.cart.push(item);
-                    }
-                    for (var i = 0; i < this.lessonsData.length; i++) {
-                        if (this.lessonsData[i].id == item.id) {
-                            this.lessonsData[i].space = this.lessonsData[i].space - 1;
-                            break;
-                        }
-                    }
-                    this.orderComplete = false;
-                },
-                removeFromCart: function (id) {
 
-                    let qty = this.cart.filter(e => {return e.id == id;})[0].qty;
-                    this.cart = this.cart.filter(e => {return e.id != id;});
+                    }, methods: {
 
-                    for (var i = 0; i < this.lessonsData.length; i++) {
-                        if (this.lessonsData[i].id == id) {
-                            this.lessonsData[i].space = this.lessonsData[i].space + qty;
-                            break;
-                        }
+                        addToCart: function (item) {
+
+                            let updated = 0;
+                            for (var i = 0; i < this.cart.length; i++) {
+                                if (this.cart[i]._id == item._id) {
+                                    this.cart[i].qty = this.cart[i].qty + 1;
+                                    updated = 1;
+                                    break;
+                                }
+                            }
+                            if (!updated) {
+                                item.qty = 1;
+                                this.cart.push(item);
+                            }
+                            for (var i = 0; i < this.lessonsData.length; i++) {
+                                if (this.lessonsData[i]._id == item._id) {
+                                    this.lessonsData[i].space = this.lessonsData[i].space - 1;
+                                    break;
+                                }
+                            }
+                            this.orderComplete = false;
+                        },
+                        removeFromCart: function (id) {
+
+                            let qty = this.cart.filter(e => {return e._id == id;})[0].qty;
+                            this.cart = this.cart.filter(e => {return e._id != id;});
+
+                            for (var i = 0; i < this.lessonsData.length; i++) {
+                                if (this.lessonsData[i]._id == id) {
+                                    this.lessonsData[i].space = this.lessonsData[i].space + qty;
+                                    break;
+                                }
+                            }
+                        },
+                        goToCheckout: function () {
+                            this.showProduct = false;
+                        },
+                        goToHome: function () {
+                            this.showProduct = true;
+                        },
+                        checkoutOrder: function () {
+                            for (var i = 0; i < this.cart.length; i++) {
+                                createRequest("POST", "orders", {
+                                    name: this.checkout.name,
+                                    phone: this.checkout.phone,
+                                    lesson_id: this.cart[i]._id,
+                                    spaces: this.cart[i].qty,
+                                });
+                                let dat = this.lessonsData.filter(e => {return e._id == this.cart[i]._id;})[0];
+                                let _id = dat._id;
+                                // delete dat['_id'];
+                                createRequest("PUT", "lessons/" + _id, {
+
+                                    "space": dat.space,
+
+                                });
+                            }
+                            this.cart = [];
+                            this.orderComplete = true;
+                        },
+                        sortProducts: function () {
+                            let asc = 1;
+                            let desc = -1;
+                            if (this.orderBy == "desc") {
+                                asc = -1;
+                                desc = 1;
+                            }
+                            if (this.sortBy == "subject") {
+                                return this.lessonsData.sort((r1, r2) => (r1.subject > r2.subject) ? asc : (r1.subject < r2.subject) ? desc : 0);
+                            }
+                            if (this.sortBy == "location") {
+                                return this.lessonsData.sort((r1, r2) => (r1.location > r2.location) ? asc : (r1.location < r2.location) ? desc : 0);
+                            }
+                            if (this.sortBy == "price") {
+                                return this.lessonsData.sort((r1, r2) => (r1.price > r2.price) ? asc : (r1.price < r2.price) ? desc : 0);
+                            }
+                            if (this.sortBy == "space") {
+                                return this.lessonsData.sort((r1, r2) => (r1.space > r2.space) ? asc : (r1.space < r2.space) ? desc : 0);
+                            }
+
+                        },
+
+                    }, computed: {
+                        totalItemsInCart: function () {
+                            return this.cart.length || 0;
+                        },
+                        isCheckoutInValid: function () {
+                            return !/^[a-zA-Z]+$/.test(this.checkout.name) || !/^[0-9]+$/.test(this.checkout.phone);
+                        },
+
                     }
-                },
-                goToCheckout: function () {
-                    this.showProduct = false;
-                },
-                goToHome: function () {
-                    this.showProduct = true;
-                },
-                checkoutOrder: function () {
-                    this.cart = [];
-                    this.orderComplete = true;
-                },
-                sortProducts: function () {
-                    let asc=1;
-                    let desc=-1;
-                    if (this.orderBy == "desc") {
-                        asc=-1;
-                        desc=1;
-                    }
-                    if (this.sortBy == "subject") {
-                        return this.lessonsData.sort((r1, r2) => (r1.subject > r2.subject) ? asc : (r1.subject < r2.subject) ? desc : 0);
-                    }
-                    if (this.sortBy == "location") {
-                        return this.lessonsData.sort((r1, r2) => (r1.location > r2.location) ? asc : (r1.location < r2.location) ? desc : 0);
-                    }
-                    if (this.sortBy == "price") {
-                        return this.lessonsData.sort((r1, r2) => (r1.price > r2.price) ? asc : (r1.price < r2.price) ? desc : 0);
-                    }
-                    if (this.sortBy == "space") {
-                        return this.lessonsData.sort((r1, r2) => (r1.space > r2.space) ? asc : (r1.space < r2.space) ? desc : 0);
-                    }
-                    
-                },
-                
-            }, computed: {
-                totalItemsInCart: function () {
-                    return this.cart.length || 0;
-                },
-                isCheckoutInValid: function () {
-                    return !/^[a-zA-Z]+$/.test(this.checkout.name) || !/^[0-9]+$/.test(this.checkout.phone);
-                },
+                });
 
             }
-        });
+        };
+        xhr.send();
     </script>
 </body>
 
